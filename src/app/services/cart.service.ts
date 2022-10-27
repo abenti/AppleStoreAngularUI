@@ -17,9 +17,9 @@ import {ToastrService} from "ngx-toastr";
 export class CartService {
   private url = environment.serverURL;
   private cartDataServer: CartModelServer = {
-    _id: 0,
+    _id: "",
     product: {
-      _id: 0,
+      _id: {},
       name: "",
       category: "",
       description: "",
@@ -49,11 +49,9 @@ export class CartService {
     this.cartDataObs$.next(this.cartDataServer);
 
     // @ts-ignore
-    let info: CartModelServer = JSON.parse(localStorage.getItem('cart')) | undefined;
-
+    let info: CartModelServer = JSON.parse(localStorage.getItem('cart'));
     if (info !== null && info !== undefined) {
       this.cartDataServer = info;
-
       // this.productService.getSingleProduct(p.id).subscribe((actualProdInfo: ProductModelServer) => {
       //     if (this.cartDataServer !== undefined) {
       //       this.cartDataServer.product = actualProdInfo;
@@ -77,16 +75,17 @@ export class CartService {
     return this.http.get<CartModelServer>(this.url + '/carts')
   }
 
-  AddProductToCart(id: any) {
-  console.log(id)
-    this.productService.getSingleProduct(id).subscribe(prod => {
-      // If the cart is empty
-      if (this.cartDataServer.product === undefined) {
+  AddProductToCart(prod: ProductModelServer) {
+      if (this.cartDataServer.product.name === "" || this.cartDataServer.product._id === null) {
+        console.log(prod)
         this.cartDataServer.product = prod;
+        // @ts-ignore
+        this.cartDataServer.quantity = 1;
         // @ts-ignore
         this.cartDataServer.total = prod.price*this.cartDataServer.quantity;
         localStorage.setItem('cart', JSON.stringify(this.cartDataServer));
         this.cartDataObs$.next({...this.cartDataServer});
+        console.log(this.cartDataObs$)
         this.toast.success(`${prod.name} added to the cart.`, "Product Added", {
           timeOut: 1500,
           progressBar: true,
@@ -95,8 +94,13 @@ export class CartService {
         })
       }
       else {
+        console.log(this.cartDataServer)
            // @ts-ignore
-          this.cartDataServer.quantity = this.cartDataServer.quantity++;
+          this.cartDataServer.quantity += 1;
+          // @ts-ignore
+        this.cartDataServer.total = this.cartDataServer.product.price*this.cartDataServer.quantity;
+          localStorage.setItem('cart', JSON.stringify(this.cartDataServer));
+          this.cartDataObs$.next({...this.cartDataServer});
           this.toast.info(`${prod.name} quantity updated in the cart.`, "Product Updated", {
             timeOut: 1500,
             progressBar: true,
@@ -104,7 +108,7 @@ export class CartService {
             positionClass: 'toast-top-right'
           })
         }
-    });
+    // });
   }
   UpdateCartData(increase?: Boolean) {
     if (increase) {
@@ -132,9 +136,9 @@ export class CartService {
   DeleteProductFromCart() {
     if (window.confirm('Are you sure you want to delete the item?')) {
       this.cartDataServer = {
-        _id: 0,
+        _id: "",
         product: {
-          _id: 0,
+          _id: "",
           name: "",
           category: "",
           description: "",

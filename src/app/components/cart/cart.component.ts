@@ -13,9 +13,9 @@ export class CartComponent implements OnInit {
   cartTotal: Number;
   constructor(public cartService: CartService) {
     this.cartData = {
-      _id: 0,
+      _id: "",
       product: {
-        _id: 0,
+        _id: "",
         name: "",
         category: "",
         description: "",
@@ -33,6 +33,7 @@ export class CartComponent implements OnInit {
   ngOnInit() {
     this.cartService.cartDataObs$.subscribe(data => this.cartData = data);
     this.cartService.cartTotal$.subscribe(total => this.cartTotal = total);
+    console.log(this.cartData)
   }
 
   ChangeQuantity(increaseQuantity: Boolean) {

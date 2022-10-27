@@ -23,8 +23,8 @@ export class ProductsComponent implements OnInit {
     });
   }
 
-  AddProduct(id: Number) {
-    this.cartService.AddProductToCart(id);
+  AddProduct(p: ProductModelServer) {
+    this.cartService.AddProductToCart(p);
   }
 
   selectProduct(id: Number) {

@@ -27,13 +27,12 @@
               <div class="card-body">
                 <h6>{{p.description.substr(0, 40)}} ....</h6>
                 <p class="lead">{{p.price | currency:'USD'}}</p>
-                <p class="lead">{{p._id}}</p>
               </div>
 
               <div class="row d-flex justify-content-center border-primary my-3">
                 <div class="col-md-6 ">
                   <button class="btn btn-outline-danger btn-sm btn-block"
-                          (click)="AddProduct(p._id)"> Add to Cart
+                          (click)="AddProduct(p)"> Add to Cart
                   </button>
                 </div>
               </div>
