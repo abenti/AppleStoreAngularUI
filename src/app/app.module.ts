@@ -1,6 +1,6 @@
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NgModule } from '@angular/core';
+import {Inject, NgModule} from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import {APP_BASE_HREF} from '@angular/common';
 import { AppRoutingModule } from './app-routing.module';
@@ -11,7 +11,9 @@ import { FooterComponent } from './components/footer/footer.component';
 import { CheckoutComponent } from './components/checkout/checkout.component';
 import { CartComponent } from './components/cart/cart.component';
 import { SuccessComponent } from './components/success/success.component';
+import { ProductsComponent } from './components/products/products.component';
 import { ProductComponent } from './components/product/product.component';
+import {ToastrModule} from "ngx-toastr";
 
 @NgModule({
   declarations: [
@@ -22,15 +24,18 @@ import { ProductComponent } from './components/product/product.component';
     CheckoutComponent,
     CartComponent,
     SuccessComponent,
-    ProductComponent
+    ProductsComponent,
+    ProductComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    HttpClientModule
+    HttpClientModule,
+    ToastrModule.forRoot(),
   ],
   providers: [{provide: APP_BASE_HREF, useValue: '/'}],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}
