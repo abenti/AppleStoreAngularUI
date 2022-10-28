@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {environment} from "../../../environments/environment";
 import {HttpClient} from "@angular/common/http";
-import {CartModelServer} from "../../models/cart.model";
-import {ProductModelServer} from "../../models/product.model";
 import {ProductsOrderModel} from "../../models/order.model"
 import {Router} from "@angular/router";
 @Component({

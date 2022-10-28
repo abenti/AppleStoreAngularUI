@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import {environment} from "../../../../environments/environment";
 import {ProductsOrderModel} from "../../../models/order.model";
 import {HttpClient} from "@angular/common/http";
-import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-order',
