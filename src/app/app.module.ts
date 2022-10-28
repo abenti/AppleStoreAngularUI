@@ -8,12 +8,12 @@ import { AppComponent } from './app.component';
 import { HomeComponent } from './components/home/home.component';
 import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
-import { CheckoutComponent } from './components/checkout/checkout.component';
 import { CartComponent } from './components/cart/cart.component';
 import { SuccessComponent } from './components/success/success.component';
 import { ProductsComponent } from './components/products/products.component';
 import { ProductComponent } from './components/product/product.component';
 import {ToastrModule} from "ngx-toastr";
+import { OrderComponent } from './components/order/order/order.component';
 
 @NgModule({
   declarations: [
@@ -21,11 +21,11 @@ import {ToastrModule} from "ngx-toastr";
     HomeComponent,
     HeaderComponent,
     FooterComponent,
-    CheckoutComponent,
     CartComponent,
     SuccessComponent,
     ProductsComponent,
     ProductComponent,
+    OrderComponent,
   ],
   imports: [
     BrowserModule,

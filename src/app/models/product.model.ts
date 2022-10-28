@@ -1,5 +1,5 @@
 export interface ProductModelServer {
-  _id: any;
+  _id: string;
   name: string;
   category: string;
   description: string;
@@ -11,8 +11,10 @@ export interface ProductModelServer {
 }
 
 export interface ProductsTemplateModel {
-  _id: any;
+  _id: string;
   name: string;
   image: string;
   price: number;
 }
+
+

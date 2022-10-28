@@ -1,9 +1,9 @@
 import {ProductModelServer} from "./product.model";
 
 export interface CartModelServer {
-  _id: any,
+  _id: string,
   product: ProductModelServer,
-  quantity: Number,
-  total: Number;
+  quantity: number,
+  total: number;
 }
 

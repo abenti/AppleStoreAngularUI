@@ -27,7 +27,7 @@ export class ProductsComponent implements OnInit {
     this.cartService.AddProductToCart(p);
   }
 
-  selectProduct(id: Number) {
+  selectProduct(id: string) {
     this.router.navigate(['/product', id]).then();
   }
 

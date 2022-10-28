@@ -20,7 +20,6 @@ export class HeaderComponent implements OnInit {
     this.cartService.cartTotal$.subscribe(total => {
       this.cartTotal = total;
     });
-
     this.cartService.cartDataObs$.subscribe(data => this.cartData = data);
   }
 

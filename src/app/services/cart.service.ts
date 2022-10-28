@@ -10,6 +10,7 @@ import {NavigationExtras, Router} from "@angular/router";
 // import {OrderService} from "./order.service";
 import {NgxSpinnerService} from "ngx-spinner";
 import {ToastrService} from "ngx-toastr";
+import {ProductsOrderModel} from "../models/order.model";
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,7 @@ export class CartService {
   private cartDataServer: CartModelServer = {
     _id: "",
     product: {
-      _id: {},
+      _id: "",
       name: "",
       category: "",
       description: "",
@@ -39,77 +40,58 @@ export class CartService {
   cartDataObs$ = new BehaviorSubject<CartModelServer>(this.cartDataServer);
 
   constructor(private productService: ProductService,
-              // private orderService: OrderService,
               private http: HttpClient,
               private router: Router,
               private spinner: NgxSpinnerService,
               private toast: ToastrService) {
 
     this.cartTotal$.next(this.cartDataServer.total);
-    this.cartDataObs$.next(this.cartDataServer);
+    this.cartDataObs$.next(JSON.parse(<any>localStorage.getItem("cart")));
 
     // @ts-ignore
     let info: CartModelServer = JSON.parse(localStorage.getItem('cart'));
     if (info !== null && info !== undefined) {
       this.cartDataServer = info;
-      // this.productService.getSingleProduct(p.id).subscribe((actualProdInfo: ProductModelServer) => {
-      //     if (this.cartDataServer !== undefined) {
-      //       this.cartDataServer.product = actualProdInfo;
-      //       this.cartDataServer._id = actualProdInfo._id;
-      //       // @ts-ignore
-      //       this.cartDataClient._id = this.cartDataServer._id;
-      //       // @ts-ignore
-      //       this.cartDataClient.total = actualProdInfo.price*this.cartDataServer.quantity;
-      //       // @ts-ignore
-      //       this.cartDataClient.total = this.cartDataServer.total;
-      //       // @ts-ignore
-      //       this.cartDataClient.quantity = this.cartDataServer.quantity;
-      //       localStorage.setItem('cart', JSON.stringify(this.cartDataServer));
-      //     }
-      //     this.cartDataObs$.next({...this.cartDataServer});
-      //   })
     }
   }
 
-  getProductsCart(): Observable<CartModelServer>{
+  getProductsCart(): Observable<CartModelServer> {
     return this.http.get<CartModelServer>(this.url + '/carts')
   }
 
   AddProductToCart(prod: ProductModelServer) {
-      if (this.cartDataServer.product.name === "" || this.cartDataServer.product._id === null) {
-        console.log(prod)
-        this.cartDataServer.product = prod;
-        // @ts-ignore
-        this.cartDataServer.quantity = 1;
-        // @ts-ignore
-        this.cartDataServer.total = prod.price*this.cartDataServer.quantity;
-        localStorage.setItem('cart', JSON.stringify(this.cartDataServer));
-        this.cartDataObs$.next({...this.cartDataServer});
-        console.log(this.cartDataObs$)
-        this.toast.success(`${prod.name} added to the cart.`, "Product Added", {
-          timeOut: 1500,
-          progressBar: true,
-          progressAnimation: 'increasing',
-          positionClass: 'toast-top-right'
-        })
-      }
-      else {
-        console.log(this.cartDataServer)
-           // @ts-ignore
-          this.cartDataServer.quantity += 1;
-          // @ts-ignore
-        this.cartDataServer.total = this.cartDataServer.product.price*this.cartDataServer.quantity;
-          localStorage.setItem('cart', JSON.stringify(this.cartDataServer));
-          this.cartDataObs$.next({...this.cartDataServer});
-          this.toast.info(`${prod.name} quantity updated in the cart.`, "Product Updated", {
-            timeOut: 1500,
-            progressBar: true,
-            progressAnimation: 'increasing',
-            positionClass: 'toast-top-right'
-          })
-        }
+    if (this.cartDataServer.product.name === "" || this.cartDataServer.product._id === null) {
+      console.log(prod)
+      this.cartDataServer.product = prod;
+      // @ts-ignore
+      this.cartDataServer.quantity = 1;
+      // @ts-ignore
+      this.cartDataServer.total = prod.price * this.cartDataServer.quantity;
+      localStorage.setItem('cart', JSON.stringify(this.cartDataServer));
+      this.cartDataObs$.next({...this.cartDataServer});
+      this.toast.success(`${prod.name} added to the cart.`, "Product Added", {
+        timeOut: 1500,
+        progressBar: true,
+        progressAnimation: 'increasing',
+        positionClass: 'toast-top-right'
+      })
+    } else {
+      // @ts-ignore
+      this.cartDataServer.quantity += 1;
+      // @ts-ignore
+      this.cartDataServer.total = this.cartDataServer.product.price * this.cartDataServer.quantity;
+      localStorage.setItem('cart', JSON.stringify(this.cartDataServer));
+      this.cartDataObs$.next({...this.cartDataServer});
+      this.toast.info(`${prod.name} quantity updated in the cart.`, "Product Updated", {
+        timeOut: 1500,
+        progressBar: true,
+        progressAnimation: 'increasing',
+        positionClass: 'toast-top-right'
+      })
+    }
     // });
   }
+
   UpdateCartData(increase?: Boolean) {
     if (increase) {
       // @ts-ignore
@@ -120,14 +102,16 @@ export class CartService {
       localStorage.setItem('cart', JSON.stringify(this.cartDataServer));
     } else {
       // @ts-ignore
-      this.cartDataServer.quantity--;
+      this.cartDataServer.quantity -= 1;
       // @ts-ignore
       this.cartDataServer.total -= this.cartDataServer.product.price;
       // @ts-ignore
+      this.cartDataObs$.next({...this.cartDataServer});
       if (this.cartDataServer.quantity < 1) {
         this.DeleteProductFromCart();
         this.cartDataObs$.next({...this.cartDataServer});
       }
+      localStorage.setItem('cart', JSON.stringify(this.cartDataServer));
 
     }
 
@@ -149,7 +133,8 @@ export class CartService {
           size: [],
         },
         quantity: 0,
-        total: 0};
+        total: 0
+      };
       localStorage.setItem('cart', JSON.stringify(this.cartDataServer));
       this.cartDataObs$.next({...this.cartDataServer});
     }
@@ -157,9 +142,66 @@ export class CartService {
     else {
       return;
     }
+  }
 
+  CheckoutFromCart(product: CartModelServer) {
+    // @ts-ignore
+    this.http.post(`${this.url}/order`, product)
+      .subscribe(
+        // @ts-ignore
+        (data:ProductsOrderModel) => {
+          console.log(data);
+          const navigationExtras: NavigationExtras = {
+            state: {
+              product: data.product,
+              id: data.id,
+              total: data.total
+            }
+          };
+          this.spinner.hide().then();
+          this.router.navigate(['/success'], navigationExtras).then(p => {
+            this.cartTotal$.next(0);
+            this.resetServerData();
+            localStorage.setItem('cart', JSON.stringify(this.cartDataServer));
+          });
+        },
+        err => { this.spinner.hide().then();
+          this.router.navigateByUrl('/cart').then();
+          this.toast.error(`Sorry, failed to book the order`, "Order Status", {
+            timeOut: 1500,
+            progressBar: true,
+            progressAnimation: 'increasing',
+            positionClass: 'toast-top-right'
+          })
+        })
+  }
 
+  private resetServerData() {
+    this.cartDataServer = {
+      _id: "",
+      product: {
+        _id: "",
+        name: "",
+        category: "",
+        description: "",
+        image: "",
+        price: 0,
+        images: "",
+        color: [],
+        size: [],
+      },
+      quantity: 0,
+      total: 0
+    };
+    this.cartDataObs$.next({...this.cartDataServer});
   }
 }
 
+interface OrderConfirmationResponse {
+  _id: string;
+  products: [{
+    id: String,
+    numInCart: String
+  }]
+}
 

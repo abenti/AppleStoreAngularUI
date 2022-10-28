@@ -10,7 +10,6 @@ import {CartModelServer} from "../../models/cart.model";
 })
 export class CartComponent implements OnInit {
   cartData: CartModelServer;
-  cartTotal: Number;
   constructor(public cartService: CartService) {
     this.cartData = {
       _id: "",
@@ -27,13 +26,14 @@ export class CartComponent implements OnInit {
       },
       quantity: 0,
       total: 0};
-    this.cartTotal = 0;
   }
 
   ngOnInit() {
     this.cartService.cartDataObs$.subscribe(data => this.cartData = data);
-    this.cartService.cartTotal$.subscribe(total => this.cartTotal = total);
-    console.log(this.cartData)
+  }
+
+  cartCheckout(product: CartModelServer){
+    this.cartService.CheckoutFromCart(product);
   }
 
   ChangeQuantity(increaseQuantity: Boolean) {
